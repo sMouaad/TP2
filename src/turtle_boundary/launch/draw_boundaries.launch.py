@@ -7,26 +7,18 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
 
-    # Arguments pour vitesse et marge des limites
+    # Arguments pour vitesse et taille du rectangle
     speed_arg = DeclareLaunchArgument(
-        'speed', default_value='2.0',
-        description='Maximum linear/angular speed of the turtle'
+        'speed', default_value='0.2',
+        description='Maximum linear speed of the Create3 (m/s)'
     )
 
-    boundary_margin_arg = DeclareLaunchArgument(
-        'boundary_margin', default_value='0.5',
-        description='Distance from the turtlesim wall edge defining the boundary'
+    rect_size_arg = DeclareLaunchArgument(
+        'rect_size', default_value='1.5',
+        description='Size of the rectangle to trace (meters)'
     )
 
-    # Node Turtlesim
-    turtlesim_node = Node(
-        package='turtlesim',
-        executable='turtlesim_node',
-        name='turtlesim_node',
-        output='screen'
-    )
-
-    # Node Draw Boundaries (ton node principal)
+    # Node Draw Boundaries (contrôleur principal)
     draw_boundaries_node = Node(
         package='turtle_boundary',
         executable='draw_boundaries',
@@ -34,7 +26,7 @@ def generate_launch_description():
         output='screen',
         parameters=[{
             'speed': LaunchConfiguration('speed'),
-            'boundary_margin': LaunchConfiguration('boundary_margin')
+            'rect_size': LaunchConfiguration('rect_size')
         }]
     )
 
@@ -46,10 +38,10 @@ def generate_launch_description():
     )
 
     # Retour de la LaunchDescription
+    # PAS de turtlesim_node — le Create3 réel tourne déjà via Docker
     return LaunchDescription([
         speed_arg,
-        boundary_margin_arg,
-        turtlesim_node,
+        rect_size_arg,
         draw_boundaries_node,
         keyboard_listener_node
     ])
