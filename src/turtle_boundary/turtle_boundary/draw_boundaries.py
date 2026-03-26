@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
+from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
@@ -43,12 +44,19 @@ class TurtleBoundary(Node):
         self.undock_client = ActionClient(
             self, Undock, f'{ROBOT_NS}/undock')
 
+        # ── QoS pour Create3 (BEST_EFFORT comme le robot publie) ──
+        sensor_qos = QoSProfile(
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10
+        )
+
         # ── Subscribers ──
         self.sub = self.create_subscription(
             Odometry,
             f'{ROBOT_NS}/odom',
             self.odom_callback,
-            10)
+            sensor_qos)
 
         # ── Publisher ──
         self.pub = self.create_publisher(

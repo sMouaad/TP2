@@ -1,6 +1,6 @@
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -30,14 +30,16 @@ def generate_launch_description():
         }]
     )
 
-    # Keyboard listener dans un xterm pour lire les touches correctement
-    keyboard_listener_node = ExecuteProcess(
-        cmd=['xterm', '-hold', '-e', 'ros2 run turtle_boundary keyboard_listener'],
+    # Keyboard listener — doit être lancé dans un terminal SÉPARÉ pour stdin :
+    #   ros2 run turtle_boundary keyboard_listener
+    # On l'inclut ici mais il faut un terminal séparé pour qu'il fonctionne
+    keyboard_listener_node = Node(
+        package='turtle_boundary',
+        executable='keyboard_listener',
         name='keyboard_listener',
-        output='screen'
+        output='screen',
     )
 
-    # Retour de la LaunchDescription
     # PAS de turtlesim_node — le Create3 réel tourne déjà via Docker
     return LaunchDescription([
         speed_arg,
